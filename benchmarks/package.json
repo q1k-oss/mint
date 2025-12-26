@@ -1,0 +1,16 @@
+{
+  "name": "benchmarks",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "benchmark": "tsx index.ts"
+  },
+  "dependencies": {
+    "@mint-format/mint": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "^4.6.0",
+    "typescript": "^5.3.2"
+  }
+}
