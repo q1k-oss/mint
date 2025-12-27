@@ -70,5 +70,9 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "build": "^0.1.4",
+    "test": "^3.3.0"
   }
 }

@@ -69,21 +69,27 @@ function formatPrimitive(value, options, inTable = false) {
   }
   return String(value);
 }
+function isPrimitive(value) {
+  return value === null || typeof value === "string" || typeof value === "number" || typeof value === "boolean";
+}
 function isTableArray(arr) {
   if (arr.length === 0) return false;
   if (!arr.every((item) => item !== null && typeof item === "object" && !Array.isArray(item))) {
     return false;
   }
   const firstKeys = Object.keys(arr[0]).sort().join(",");
-  return arr.every((item) => {
+  const sameKeys = arr.every((item) => {
     const keys = Object.keys(item).sort().join(",");
     return keys === firstKeys;
   });
+  if (!sameKeys) return false;
+  return arr.every((item) => {
+    const obj = item;
+    return Object.values(obj).every((val) => isPrimitive(val));
+  });
 }
 function isPrimitiveArray(arr) {
-  return arr.every(
-    (item) => item === null || typeof item === "string" || typeof item === "number" || typeof item === "boolean"
-  );
+  return arr.every((item) => isPrimitive(item));
 }
 function getColumnWidths(headers, rows) {
   const widths = headers.map((h) => h.length);

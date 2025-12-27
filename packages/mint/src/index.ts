@@ -148,6 +148,13 @@ function formatPrimitive(value: JsonValue, options: EncodeOptions, inTable = fal
 }
 
 /**
+ * Check if a value is a primitive (not an object or array)
+ */
+function isPrimitive(value: JsonValue): boolean {
+  return value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+}
+
+/**
  * Check if array can be a table
  */
 function isTableArray(arr: JsonValue[]): arr is Record<string, JsonValue>[] {
@@ -160,11 +167,20 @@ function isTableArray(arr: JsonValue[]): arr is Record<string, JsonValue>[] {
   const firstKeys = Object.keys(arr[0] as Record<string, JsonValue>)
     .sort()
     .join(',');
-  return arr.every((item) => {
+
+  const sameKeys = arr.every((item) => {
     const keys = Object.keys(item as Record<string, JsonValue>)
       .sort()
       .join(',');
     return keys === firstKeys;
+  });
+
+  if (!sameKeys) return false;
+
+  // Only use table format if ALL values are primitives (no nested objects/arrays)
+  return arr.every((item) => {
+    const obj = item as Record<string, JsonValue>;
+    return Object.values(obj).every((val) => isPrimitive(val));
   });
 }
 
@@ -172,10 +188,7 @@ function isTableArray(arr: JsonValue[]): arr is Record<string, JsonValue>[] {
  * Check if array contains only primitives
  */
 function isPrimitiveArray(arr: JsonValue[]): boolean {
-  return arr.every(
-    (item) =>
-      item === null || typeof item === 'string' || typeof item === 'number' || typeof item === 'boolean'
-  );
+  return arr.every((item) => isPrimitive(item));
 }
 
 /**

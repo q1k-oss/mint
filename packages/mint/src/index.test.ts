@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { encode, decode, validate, estimateTokens } from '../src/index';
+import { encode, decode, validate, estimateTokens } from './index';
 
 describe('🌿 MINT Format', () => {
   describe('encode', () => {
