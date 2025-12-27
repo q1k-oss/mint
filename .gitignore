@@ -1,0 +1,6 @@
+/benchmarks/node_modules
+/node_modules
+/packages/mint/node_modules
+/packages/cli/node_modules
+
+.vscode/settings.json

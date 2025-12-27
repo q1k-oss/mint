@@ -83,6 +83,7 @@ function needsQuoting(value: string): boolean {
   if (value === '') return true;
   if (value.startsWith(' ') || value.endsWith(' ')) return true;
   if (value.includes('|') || value.includes('\n') || value.includes('\r')) return true;
+  if (value.includes(',')) return true; // Commas would be parsed as array separators
   if (/^-?\d+\.?\d*$/.test(value)) return true;
   if (['true', 'false', 'null'].includes(value.toLowerCase())) return true;
   if (value.includes(':') && !value.includes('://')) return true;
@@ -505,12 +506,12 @@ function parseDocument(
       // Look ahead for nested content
       let foundNested = false;
       let nextIdx = i + 1;
-      
+
       // Skip blank lines to find actual content
       while (nextIdx < lines.length && lines[nextIdx].trim() === '') {
         nextIdx++;
       }
-      
+
       if (nextIdx < lines.length) {
         const nextLine = lines[nextIdx];
         const nextIndent = nextLine.length - nextLine.trimStart().length;
@@ -535,6 +536,10 @@ function parseDocument(
         result[key] = valueStr === '[]' ? [] : {};
         i++;
       }
+    } else if (valueStr.startsWith('"') && valueStr.endsWith('"')) {
+      // Quoted string - parse as single value, don't split
+      result[key] = parsePrimitive(valueStr);
+      i++;
     } else if (valueStr.includes(' | ')) {
       result[key] = valueStr.split(' | ').map((v) => parsePrimitive(v.trim()));
       i++;
