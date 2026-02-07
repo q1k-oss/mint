@@ -1,0 +1,62 @@
+{
+  "name": "@mint-format/mint",
+  "version": "1.0.0",
+  "description": "🌿 MINT Format encoder/decoder - Minimal Inference Notation for Tokens",
+  "keywords": [
+    "mint",
+    "format",
+    "serialization",
+    "llm",
+    "token",
+    "json",
+    "encoder",
+    "decoder",
+    "minimal"
+  ],
+  "homepage": "https://github.com/mint-format/mint",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mint-format/mint.git",
+    "directory": "packages/mint"
+  },
+  "license": "MIT",
+  "author": "MINT Format Contributors",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "clean": "rm -rf dist",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "lint": "eslint src --ext .ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "tsup": "^8.0.1",
+    "typescript": "^5.3.2",
+    "vitest": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

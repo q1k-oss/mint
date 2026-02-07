@@ -1,0 +1,100 @@
+{
+  "description": "🌿 MINT Format Conformance Test Suite",
+  "version": "1.0.0",
+  "tests": [
+    {
+      "name": "primitives/string",
+      "description": "Simple string value",
+      "json": { "name": "Alice" },
+      "mint": "name: Alice"
+    },
+    {
+      "name": "primitives/number-integer",
+      "description": "Integer number",
+      "json": { "count": 42 },
+      "mint": "count: 42"
+    },
+    {
+      "name": "primitives/number-float",
+      "description": "Floating point number",
+      "json": { "price": 19.99 },
+      "mint": "price: 19.99"
+    },
+    {
+      "name": "primitives/boolean-true",
+      "description": "Boolean true",
+      "json": { "active": true },
+      "mint": "active: true"
+    },
+    {
+      "name": "primitives/boolean-false",
+      "description": "Boolean false",
+      "json": { "deleted": false },
+      "mint": "deleted: false"
+    },
+    {
+      "name": "primitives/null",
+      "description": "Null value",
+      "json": { "value": null },
+      "mint": "value: null"
+    },
+    {
+      "name": "primitives/quoted-string",
+      "description": "String requiring quotes",
+      "json": { "msg": "Hello, World!" },
+      "mint": "msg: \"Hello, World!\""
+    },
+    {
+      "name": "objects/simple",
+      "description": "Simple object",
+      "json": { "id": 123, "name": "Alice" },
+      "mint": "id: 123\nname: Alice"
+    },
+    {
+      "name": "objects/nested",
+      "description": "Nested object",
+      "json": { "user": { "id": 1, "name": "Alice" } },
+      "mint": "user:\n  id: 1\n  name: Alice"
+    },
+    {
+      "name": "arrays/primitive-inline",
+      "description": "Inline primitive array",
+      "json": { "tags": ["a", "b", "c"] },
+      "mint": "tags: a, b, c"
+    },
+    {
+      "name": "arrays/table",
+      "description": "Array of objects as table",
+      "json": {
+        "users": [
+          { "id": 1, "name": "Alice" },
+          { "id": 2, "name": "Bob" }
+        ]
+      },
+      "mint": "users:\n  | id | name  |\n  | 1  | Alice |\n  | 2  | Bob   |"
+    },
+    {
+      "name": "tables/null-cell",
+      "description": "Table with null cell",
+      "json": {
+        "items": [
+          { "id": 1, "value": "test" },
+          { "id": 2, "value": null }
+        ]
+      },
+      "mint": "items:\n  | id | value |\n  | 1  | test  |\n  | 2  | -     |"
+    },
+    {
+      "name": "complex/workflow",
+      "description": "Complex workflow structure",
+      "json": {
+        "workflow": { "id": "wf_123", "status": "active" },
+        "steps": [
+          { "id": 1, "tool": "search", "status": "done" },
+          { "id": 2, "tool": "process", "status": "pending" }
+        ]
+      },
+      "mint": "workflow:\n  id: wf_123\n  status: active\nsteps:\n  | id | tool    | status  |\n  | 1  | search  | done    |\n  | 2  | process | pending |"
+    }
+  ]
+}
