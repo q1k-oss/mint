@@ -24,7 +24,7 @@ interface CliOptions {
   version?: boolean;
 }
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 
 const HELP_TEXT = `
 🌿 MINT Format CLI v${VERSION}

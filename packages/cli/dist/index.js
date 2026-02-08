@@ -4,7 +4,7 @@
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { resolve, extname } from "path";
 import { encode, decode, validate } from "@q1k-oss/mint-format";
-var VERSION = "1.0.0";
+var VERSION = "1.0.1";
 var HELP_TEXT = `
 \u{1F33F} MINT Format CLI v${VERSION}
 
