@@ -3,7 +3,7 @@
 // src/index.ts
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { resolve, extname } from "path";
-import { encode, decode, validate } from "@mint-format/mint";
+import { encode, decode, validate } from "@q1k-oss/mint-format";
 var VERSION = "1.0.0";
 var HELP_TEXT = `
 \u{1F33F} MINT Format CLI v${VERSION}

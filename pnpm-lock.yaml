@@ -54,7 +54,7 @@ importers:
 
   benchmarks:
     dependencies:
-      '@mint-format/mint':
+      '@q1k-oss/mint-format':
         specifier: workspace:*
         version: link:../packages/mint
     devDependencies:
@@ -67,7 +67,7 @@ importers:
 
   packages/cli:
     dependencies:
-      '@mint-format/mint':
+      '@q1k-oss/mint-format':
         specifier: workspace:*
         version: link:../mint
     devDependencies:

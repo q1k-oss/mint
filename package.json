@@ -16,10 +16,10 @@
     "ai",
     "minimal"
   ],
-  "homepage": "https://github.com/mint-format/mint",
+  "homepage": "https://github.com/q1k-oss/mint",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mint-format/mint.git"
+    "url": "git+https://github.com/q1k-oss/mint.git"
   },
   "license": "MIT",
   "author": "MINT Format Contributors",

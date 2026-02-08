@@ -7,7 +7,7 @@
     "benchmark": "tsx index.ts"
   },
   "dependencies": {
-    "@mint-format/mint": "workspace:*"
+    "@q1k-oss/mint-format": "workspace:*"
   },
   "devDependencies": {
     "tsx": "^4.6.0",

@@ -1,5 +1,5 @@
 {
-  "name": "@mint-format/mint",
+  "name": "@q1k-oss/mint-format",
   "version": "1.0.0",
   "description": "🌿 MINT Format encoder/decoder - Minimal Inference Notation for Tokens",
   "keywords": [
@@ -13,10 +13,10 @@
     "decoder",
     "minimal"
   ],
-  "homepage": "https://github.com/mint-format/mint",
+  "homepage": "https://github.com/q1k-oss/mint",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mint-format/mint.git",
+    "url": "git+https://github.com/q1k-oss/mint.git",
     "directory": "packages/mint"
   },
   "license": "MIT",

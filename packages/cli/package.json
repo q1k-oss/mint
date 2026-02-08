@@ -1,5 +1,5 @@
 {
-  "name": "@mint-format/cli",
+  "name": "@q1k-oss/mint-format-cli",
   "version": "1.0.0",
   "description": "🌿 CLI tool for MINT Format - Convert between JSON and MINT",
   "keywords": [
@@ -9,10 +9,10 @@
     "json",
     "converter"
   ],
-  "homepage": "https://github.com/mint-format/mint",
+  "homepage": "https://github.com/q1k-oss/mint",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mint-format/mint.git",
+    "url": "git+https://github.com/q1k-oss/mint.git",
     "directory": "packages/cli"
   },
   "license": "MIT",
@@ -36,7 +36,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@mint-format/mint": "workspace:*"
+    "@q1k-oss/mint-format": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",

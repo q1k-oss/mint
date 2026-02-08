@@ -1,7 +1,7 @@
-# 🌿 MINT Format
+# <img src=".github/logo.png" alt="MINT" width="28"> MINT Format
 
 <p align="center">
-  <img src=".github/logo.svg" alt="MINT Format Logo" width="180">
+  <img src=".github/logo.png" alt="MINT Format Logo" width="180">
 </p>
 
 <p align="center">
@@ -14,16 +14,16 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mint-format/mint/actions/workflows/ci.yml">
-    <img src="https://github.com/mint-format/mint/actions/workflows/ci.yml/badge.svg" alt="CI">
+  <a href="https://github.com/q1k-oss/mint/actions/workflows/publish.yml">
+    <img src="https://github.com/q1k-oss/mint/actions/workflows/publish.yml/badge.svg" alt="CI">
   </a>
-  <a href="https://www.npmjs.com/package/@mint-format/mint">
-    <img src="https://img.shields.io/npm/v/@mint-format/mint.svg" alt="npm version">
+  <a href="https://www.npmjs.com/package/@q1k-oss/mint-format">
+    <img src="https://img.shields.io/npm/v/@q1k-oss/mint-format.svg" alt="npm version">
   </a>
-  <a href="https://github.com/mint-format/mint/blob/main/LICENSE">
+  <a href="https://github.com/q1k-oss/mint/blob/main/LICENSE">
     <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License: MIT">
   </a>
-  <a href="https://github.com/mint-format/mint/blob/main/SPEC.md">
+  <a href="https://github.com/q1k-oss/mint/blob/main/SPEC.md">
     <img src="https://img.shields.io/badge/spec-v1.0-brightgreen" alt="SPEC v1.0">
   </a>
 </p>
@@ -69,7 +69,7 @@ messages:
 
 ## Key Features
 
-- 🌿 **Fresh & Clean** — Instantly readable, no learning curve
+- <img src=".github/logo.png" alt="MINT" width="16"> **Fresh & Clean** — Instantly readable, no learning curve
 - 📉 **47% Fewer Tokens** — Significant cost savings on LLM APIs  
 - 👁️ **Crystal Clear** — Visible `|` boundaries, Markdown tables
 - ✏️ **Edit-Friendly** — No invisible tabs, no alignment headaches
@@ -97,16 +97,16 @@ messages:
 
 ```bash
 # npm
-npm install @mint-format/mint
+npm install @q1k-oss/mint-format
 
 # pnpm  
-pnpm add @mint-format/mint
+pnpm add @q1k-oss/mint-format
 
 # yarn
-yarn add @mint-format/mint
+yarn add @q1k-oss/mint-format
 
 # CLI (no install needed)
-npx @mint-format/cli input.json -o output.mint
+npx @q1k-oss/mint-format-cli input.json -o output.mint
 ```
 
 ---
@@ -116,7 +116,7 @@ npx @mint-format/cli input.json -o output.mint
 ### Encode (JSON → MINT)
 
 ```typescript
-import { encode } from '@mint-format/mint';
+import { encode } from '@q1k-oss/mint-format';
 
 const data = {
   users: [
@@ -142,7 +142,7 @@ users:
 ### Decode (MINT → JSON)
 
 ```typescript
-import { decode } from '@mint-format/mint';
+import { decode } from '@q1k-oss/mint-format';
 
 const mint = `
 users:
@@ -246,16 +246,16 @@ Enable symbols for extra compression:
 
 ```bash
 # JSON to MINT
-npx @mint-format/cli input.json -o output.mint
+npx @q1k-oss/mint-format-cli input.json -o output.mint
 
 # MINT to JSON  
-npx @mint-format/cli input.mint -o output.json
+npx @q1k-oss/mint-format-cli input.mint -o output.json
 
 # Pipe from stdin
-cat data.json | npx @mint-format/cli > output.mint
+cat data.json | npx @q1k-oss/mint-format-cli > output.mint
 
 # Show token savings
-npx @mint-format/cli data.json --stats
+npx @q1k-oss/mint-format-cli data.json --stats
 ```
 
 ### Options
@@ -276,7 +276,7 @@ npx @mint-format/cli data.json --stats
 ### `encode(value, options?): string`
 
 ```typescript
-import { encode } from '@mint-format/mint';
+import { encode } from '@q1k-oss/mint-format';
 
 const mint = encode(data, {
   indent: 2,        // Spaces per level (default: 2)
@@ -288,7 +288,7 @@ const mint = encode(data, {
 ### `decode(input, options?): unknown`
 
 ```typescript
-import { decode } from '@mint-format/mint';
+import { decode } from '@q1k-oss/mint-format';
 
 const data = decode(mintString, {
   strict: true,     // Throw on invalid syntax (default: true)
@@ -298,7 +298,7 @@ const data = decode(mintString, {
 ### `validate(input): ValidationResult`
 
 ```typescript
-import { validate } from '@mint-format/mint';
+import { validate } from '@q1k-oss/mint-format';
 
 const result = validate(mintString);
 if (!result.valid) {
@@ -309,7 +309,7 @@ if (!result.valid) {
 ### `estimateTokens(data): TokenEstimate`
 
 ```typescript
-import { estimateTokens } from '@mint-format/mint';
+import { estimateTokens } from '@q1k-oss/mint-format';
 
 const estimate = estimateTokens(data);
 console.log(`Savings: ${estimate.savingsPercent}%`);
@@ -455,7 +455,7 @@ We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ```bash
 # Setup
-git clone https://github.com/mint-format/mint.git
+git clone https://github.com/q1k-oss/mint.git
 cd mint
 pnpm install
 
@@ -487,6 +487,6 @@ pnpm benchmark   # Run benchmarks
 ---
 
 <p align="center">
-  <strong>🌿 MINT Format</strong><br>
+  <strong><img src=".github/logo.png" alt="MINT" width="20"> MINT Format</strong><br>
   <em>Fresh data for LLMs. Keep it minimal.</em>
 </p>

@@ -6,7 +6,7 @@ Thank you for your interest in contributing! This document provides guidelines f
 
 ```bash
 # Clone the repo
-git clone https://github.com/mint-format/mint.git
+git clone https://github.com/q1k-oss/mint.git
 cd mint
 
 # Install dependencies
@@ -25,7 +25,7 @@ pnpm build
 
 ```bash
 pnpm build              # Build all packages
-pnpm --filter @mint-format/mint build  # Build specific package
+pnpm --filter @q1k-oss/mint-format build  # Build specific package
 ```
 
 ### Testing
@@ -96,7 +96,7 @@ mint-format/
 
 ## Questions?
 
-- 💬 [Discussions](https://github.com/mint-format/mint/discussions)
-- 🐛 [Issues](https://github.com/mint-format/mint/issues)
+- 💬 [Discussions](https://github.com/q1k-oss/mint/discussions)
+- 🐛 [Issues](https://github.com/q1k-oss/mint/issues)
 
 Thanks for contributing! 🌿

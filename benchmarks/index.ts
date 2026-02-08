@@ -4,7 +4,7 @@
  * Compares token efficiency and performance across formats
  */
 
-import { encode, decode, estimateTokens } from '@mint-format/mint';
+import { encode, decode, estimateTokens } from '@q1k-oss/mint-format';
 
 const datasets = {
   employees: {
