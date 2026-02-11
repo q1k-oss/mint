@@ -1,6 +1,6 @@
 {
   "name": "@q1k-oss/mint-format",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "🌿 MINT Format encoder/decoder - Minimal Inference Notation for Tokens",
   "keywords": [
     "mint",

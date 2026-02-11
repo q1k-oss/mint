@@ -28,6 +28,12 @@
   </a>
 </p>
 
+<p align="center">
+  <a href="https://mint.q1k.ai"><strong>Live Playground</strong></a> ·
+  <a href="https://github.com/q1k-oss/mint/blob/main/SPEC.md"><strong>Specification</strong></a> ·
+  <a href="https://www.npmjs.com/package/@q1k-oss/mint-format"><strong>npm</strong></a>
+</p>
+
 ---
 
 ## Why MINT?
@@ -476,7 +482,7 @@ pnpm benchmark   # Run benchmarks
 - [ ] Go implementation  
 - [ ] Rust implementation
 - [ ] VS Code extension
-- [ ] Online playground
+- [x] Online playground — [mint.q1k.ai](https://mint.q1k.ai)
 
 ---
 
