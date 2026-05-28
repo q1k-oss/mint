@@ -1,8 +1,8 @@
 # 🌿 MINT Format Specification
 
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **Status:** Stable  
-**Last Updated:** December 2024
+**Last Updated:** May 2026
 
 ---
 
@@ -13,7 +13,7 @@
 ### 1.1 Design Philosophy
 
 - **Familiar** — Uses YAML for objects, Markdown for tables
-- **Minimal** — No unnecessary syntax overhead  
+- **Minimal** — No unnecessary syntax overhead
 - **Readable** — Anyone can understand it instantly
 - **Efficient** — 40-50% fewer tokens than JSON
 
@@ -29,6 +29,7 @@
 ## 2. Document Structure
 
 A MINT document consists of statements. Each statement is either:
+
 - A key-value pair
 - A table block
 
@@ -43,6 +44,7 @@ active: true
 ```
 
 Equivalent JSON:
+
 ```json
 {
   "name": "Invoice Reconciliation",
@@ -182,6 +184,7 @@ users:
 ```
 
 Equivalent JSON:
+
 ```json
 {
   "users": [
@@ -285,6 +288,7 @@ Comments are not preserved during round-trip.
 ### 9.1 When to Quote
 
 Strings must be quoted when they:
+
 - Contain `|` or `:` (not in URLs)
 - Start/end with whitespace
 - Match keywords (`true`, `false`, `null`)
@@ -293,13 +297,13 @@ Strings must be quoted when they:
 
 ### 9.2 Escape Sequences
 
-| Sequence | Meaning |
-|----------|---------|
-| `\\` | Backslash |
-| `\"` | Double quote |
-| `\n` | Newline |
-| `\r` | Carriage return |
-| `\t` | Tab |
+| Sequence | Meaning         |
+| -------- | --------------- |
+| `\\`     | Backslash       |
+| `\"`     | Double quote    |
+| `\n`     | Newline         |
+| `\r`     | Carriage return |
+| `\t`     | Tab             |
 
 ---
 
@@ -307,16 +311,17 @@ Strings must be quoted when they:
 
 Optional symbols for additional compression:
 
-| Symbol | Meaning |
-|--------|---------|
-| `✓` | completed, success, true |
-| `✗` | failed, error, false |
-| `⏳` | pending, waiting |
-| `⚠` | warning |
-| `?` | review, unknown |
-| `-` | null, none |
+| Symbol | Meaning                  |
+| ------ | ------------------------ |
+| `✓`    | completed, success, true |
+| `✗`    | failed, error, false     |
+| `⏳`   | pending, waiting         |
+| `⚠`    | warning                  |
+| `?`    | review, unknown          |
+| `-`    | null, none               |
 
 Enable via encoder options:
+
 ```typescript
 encode(data, { compact: true });
 ```
@@ -327,25 +332,25 @@ encode(data, { compact: true });
 
 ### 11.1 Parsing (MINT → JS)
 
-| Input | Type |
-|-------|------|
-| `true` | boolean |
-| `false` | boolean |
-| `null`, `-` | null |
-| `42`, `-3.14` | number |
-| Everything else | string |
+| Input           | Type    |
+| --------------- | ------- |
+| `true`          | boolean |
+| `false`         | boolean |
+| `null`, `-`     | null    |
+| `42`, `-3.14`   | number  |
+| Everything else | string  |
 
 ### 11.2 Encoding (JS → MINT)
 
-| JavaScript | MINT |
-|------------|------|
-| `string` | Unquoted or quoted |
-| `number` | Decimal |
-| `boolean` | `true`/`false` |
-| `null` | `null` or `-` in tables |
-| `Array` | Inline or table |
-| `Object` | Nested structure |
-| `Date` | ISO string (quoted) |
+| JavaScript | MINT                    |
+| ---------- | ----------------------- |
+| `string`   | Unquoted or quoted      |
+| `number`   | Decimal                 |
+| `boolean`  | `true`/`false`          |
+| `null`     | `null` or `-` in tables |
+| `Array`    | Inline or table         |
+| `Object`   | Nested structure        |
+| `Date`     | ISO string (quoted)     |
 
 ---
 
@@ -448,12 +453,15 @@ errors:
 ### 14.1 Levels
 
 **Level 1: Basic**
+
 - Primitives, simple objects, inline arrays
 
-**Level 2: Standard**  
+**Level 2: Standard**
+
 - Tables, nested structures, quoting
 
 **Level 3: Full**
+
 - Compact mode, comments, validation
 
 ### 14.2 Test Suite
@@ -462,15 +470,57 @@ See `/tests/conformance/` for validation fixtures.
 
 ---
 
+## 15. Documents
+
+MINT can represent a **parsed document** (e.g. the output of a PDF/DOCX parser such as Docling): a title, optional metadata, and a flat list of sections whose hierarchy is expressed by an integer heading level (Markdown-style). Each section holds ordered blocks: prose text, tables, lists, and figures.
+
+Headings use `§` rather than `#` (which denotes comments — see §8). Document notation is produced and consumed by the dedicated `encodeDocument` / `decodeDocument` functions and never interferes with general-purpose `encode` / `decode`.
+
+### 15.1 Grammar
+
+```
+@title <text>            Document title (optional, first line)
+@meta                    Metadata block; indented `key: value` lines
+  key: value
+§<level> <heading>       Section heading; level is a positive integer
+<prose>                  Any non-marker line is prose text
+@table[: <caption>]      Optional caption for the table that follows
+| h1 | h2 |              Table rows (the first row is the header)
+- <item>                 Unordered list item
+1. <item>                Ordered list item
+@fig: "<caption>" p.<n>  Figure (caption and page both optional)
+```
+
+A prose line that begins with a reserved marker (`§`, `@`, `|`, `- `, or `<n>.`) is prefixed with `\` on encode and unescaped on decode, keeping round-trips lossless.
+
+### 15.2 Example
+
+```mint
+@title Returns & Refunds SOP
+@meta
+  pages: 4
+§1 Overview
+This SOP covers returns.
+§2 Eligibility
+@table: Return windows
+| Category | Days |
+| Apparel  | 30   |
+1. Inspect item
+2. Issue refund
+@fig: "Refund flow" p.3
+```
+
+---
+
 ## Appendix A: Token Efficiency
 
 For an array of 10 objects with 5 fields:
 
-| Format | Tokens |
-|--------|--------|
-| JSON | 250-300 |
-| YAML | 180-220 |
-| TOON | 120-150 |
+| Format   | Tokens      |
+| -------- | ----------- |
+| JSON     | 250-300     |
+| YAML     | 180-220     |
+| TOON     | 120-150     |
 | **MINT** | **140-170** |
 
 MINT trades ~15% vs TOON for significantly better readability.
@@ -497,4 +547,4 @@ MINT trades ~15% vs TOON for significantly better readability.
 
 ---
 
-*End of Specification*
+_End of Specification_

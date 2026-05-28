@@ -43,50 +43,57 @@ export interface TokenEstimate {
 
 // Status symbols for compact mode
 const STATUS_SYMBOLS: Record<string, string> = {
-  completed: '✓',
-  complete: '✓',
-  success: '✓',
-  done: '✓',
-  passed: '✓',
-  true: '✓',
-  yes: '✓',
-  failed: '✗',
-  failure: '✗',
-  error: '✗',
-  rejected: '✗',
-  false: '✗',
-  no: '✗',
-  pending: '⏳',
-  waiting: '⏳',
-  in_progress: '⏳',
-  running: '⏳',
-  warning: '⚠',
-  warn: '⚠',
-  review: '?',
-  unknown: '?',
+  completed: "✓",
+  complete: "✓",
+  success: "✓",
+  done: "✓",
+  passed: "✓",
+  true: "✓",
+  yes: "✓",
+  failed: "✗",
+  failure: "✗",
+  error: "✗",
+  rejected: "✗",
+  false: "✗",
+  no: "✗",
+  pending: "⏳",
+  waiting: "⏳",
+  in_progress: "⏳",
+  running: "⏳",
+  warning: "⚠",
+  warn: "⚠",
+  review: "?",
+  unknown: "?",
 };
 
 const REVERSE_SYMBOLS: Record<string, string> = {
-  '✓': 'true',
-  '✗': 'false',
-  '⏳': 'pending',
-  '⚠': 'warning',
-  '?': 'unknown',
+  "✓": "true",
+  "✗": "false",
+  "⏳": "pending",
+  "⚠": "warning",
+  "?": "unknown",
 };
 
-type JsonValue = string | number | boolean | null | JsonValue[] | { [key: string]: JsonValue };
+type JsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | JsonValue[]
+  | { [key: string]: JsonValue };
 
 /**
  * Check if a value needs quoting
  */
 function needsQuoting(value: string): boolean {
-  if (value === '') return true;
-  if (value.startsWith(' ') || value.endsWith(' ')) return true;
-  if (value.includes('|') || value.includes('\n') || value.includes('\r')) return true;
-  if (value.includes(',')) return true; // Commas would be parsed as array separators
+  if (value === "") return true;
+  if (value.startsWith(" ") || value.endsWith(" ")) return true;
+  if (value.includes("|") || value.includes("\n") || value.includes("\r"))
+    return true;
+  if (value.includes(",")) return true; // Commas would be parsed as array separators
   if (/^-?\d+\.?\d*$/.test(value)) return true;
-  if (['true', 'false', 'null'].includes(value.toLowerCase())) return true;
-  if (value.includes(':') && !value.includes('://')) return true;
+  if (["true", "false", "null"].includes(value.toLowerCase())) return true;
+  if (value.includes(":") && !value.includes("://")) return true;
   if (value.includes('"')) return true;
   return false;
 }
@@ -96,11 +103,11 @@ function needsQuoting(value: string): boolean {
  */
 function escapeString(value: string): string {
   return value
-    .replace(/\\/g, '\\\\')
+    .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
-    .replace(/\n/g, '\\n')
-    .replace(/\r/g, '\\r')
-    .replace(/\t/g, '\\t');
+    .replace(/\n/g, "\\n")
+    .replace(/\r/g, "\\r")
+    .replace(/\t/g, "\\t");
 }
 
 /**
@@ -108,36 +115,40 @@ function escapeString(value: string): string {
  */
 function unescapeString(value: string): string {
   return value
-    .replace(/\\n/g, '\n')
-    .replace(/\\r/g, '\r')
-    .replace(/\\t/g, '\t')
+    .replace(/\\n/g, "\n")
+    .replace(/\\r/g, "\r")
+    .replace(/\\t/g, "\t")
     .replace(/\\"/g, '"')
-    .replace(/\\\\/g, '\\');
+    .replace(/\\\\/g, "\\");
 }
 
 /**
  * Format a primitive value
  */
-function formatPrimitive(value: JsonValue, options: EncodeOptions, inTable = false): string {
+function formatPrimitive(
+  value: JsonValue,
+  options: EncodeOptions,
+  inTable = false,
+): string {
   if (value === null || value === undefined) {
-    return inTable ? '-' : 'null';
+    return inTable ? "-" : "null";
   }
 
-  if (typeof value === 'boolean') {
+  if (typeof value === "boolean") {
     return String(value);
   }
 
-  if (typeof value === 'number') {
-    if (!isFinite(value)) return 'null';
+  if (typeof value === "number") {
+    if (!isFinite(value)) return "null";
     return String(value);
   }
 
-  if (typeof value === 'string') {
+  if (typeof value === "string") {
     if (options.compact && STATUS_SYMBOLS[value.toLowerCase()]) {
       return STATUS_SYMBOLS[value.toLowerCase()];
     }
 
-    if (value === '' && inTable) return '-';
+    if (value === "" && inTable) return "-";
     if (needsQuoting(value)) {
       return `"${escapeString(value)}"`;
     }
@@ -151,7 +162,12 @@ function formatPrimitive(value: JsonValue, options: EncodeOptions, inTable = fal
  * Check if a value is a primitive (not an object or array)
  */
 function isPrimitive(value: JsonValue): boolean {
-  return value === null || typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean';
+  return (
+    value === null ||
+    typeof value === "string" ||
+    typeof value === "number" ||
+    typeof value === "boolean"
+  );
 }
 
 /**
@@ -160,18 +176,23 @@ function isPrimitive(value: JsonValue): boolean {
 function isTableArray(arr: JsonValue[]): arr is Record<string, JsonValue>[] {
   if (arr.length === 0) return false;
 
-  if (!arr.every((item) => item !== null && typeof item === 'object' && !Array.isArray(item))) {
+  if (
+    !arr.every(
+      (item) =>
+        item !== null && typeof item === "object" && !Array.isArray(item),
+    )
+  ) {
     return false;
   }
 
   const firstKeys = Object.keys(arr[0] as Record<string, JsonValue>)
     .sort()
-    .join(',');
+    .join(",");
 
   const sameKeys = arr.every((item) => {
     const keys = Object.keys(item as Record<string, JsonValue>)
       .sort()
-      .join(',');
+      .join(",");
     return keys === firstKeys;
   });
 
@@ -210,20 +231,26 @@ function getColumnWidths(headers: string[], rows: string[][]): number[] {
  * Pad cell to width
  */
 function padCell(value: string, width: number): string {
-  return value + ' '.repeat(Math.max(0, width - value.length));
+  return value + " ".repeat(Math.max(0, width - value.length));
 }
 
 /**
  * Encode array as table
  */
-function encodeTable(arr: Record<string, JsonValue>[], options: EncodeOptions, indentLevel: number): string {
-  if (arr.length === 0) return '| |';
+function encodeTable(
+  arr: Record<string, JsonValue>[],
+  options: EncodeOptions,
+  indentLevel: number,
+): string {
+  if (arr.length === 0) return "| |";
 
-  const indent = ' '.repeat(options.indent || 2);
+  const indent = " ".repeat(options.indent || 2);
   const baseIndent = indent.repeat(indentLevel);
 
   const headers = Object.keys(arr[0]);
-  const rows: string[][] = arr.map((obj) => headers.map((h) => formatPrimitive(obj[h], options, true)));
+  const rows: string[][] = arr.map((obj) =>
+    headers.map((h) => formatPrimitive(obj[h], options, true)),
+  );
 
   const widths = getColumnWidths(headers, rows);
 
@@ -231,51 +258,55 @@ function encodeTable(arr: Record<string, JsonValue>[], options: EncodeOptions, i
 
   // Header
   const headerCells = headers.map((h, i) => padCell(h, widths[i]));
-  lines.push(`${baseIndent}| ${headerCells.join(' | ')} |`);
+  lines.push(`${baseIndent}| ${headerCells.join(" | ")} |`);
 
   // Rows
   for (const row of rows) {
     const cells = row.map((cell, i) => padCell(cell, widths[i]));
-    lines.push(`${baseIndent}| ${cells.join(' | ')} |`);
+    lines.push(`${baseIndent}| ${cells.join(" | ")} |`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
  * Encode value recursively
  */
-function encodeValue(value: JsonValue, options: EncodeOptions, indentLevel: number): string {
-  const indent = ' '.repeat(options.indent || 2);
+function encodeValue(
+  value: JsonValue,
+  options: EncodeOptions,
+  indentLevel: number,
+): string {
+  const indent = " ".repeat(options.indent || 2);
   const baseIndent = indent.repeat(indentLevel);
 
   // Primitives
-  if (value === null || typeof value !== 'object') {
+  if (value === null || typeof value !== "object") {
     return formatPrimitive(value, options);
   }
 
   // Arrays
   if (Array.isArray(value)) {
     if (value.length === 0) {
-      return '[]';
+      return "[]";
     }
 
     if (isPrimitiveArray(value)) {
-      return value.map((v) => formatPrimitive(v, options)).join(', ');
+      return value.map((v) => formatPrimitive(v, options)).join(", ");
     }
 
     if (isTableArray(value)) {
-      return '\n' + encodeTable(value, options, indentLevel + 1);
+      return "\n" + encodeTable(value, options, indentLevel + 1);
     }
 
     // Mixed arrays
     const lines: string[] = [];
     for (const item of value) {
-      if (item === null || typeof item !== 'object') {
+      if (item === null || typeof item !== "object") {
         lines.push(`${baseIndent}${indent}- ${formatPrimitive(item, options)}`);
       } else {
         const encoded = encodeValue(item, options, indentLevel + 2);
-        if (encoded.includes('\n')) {
+        if (encoded.includes("\n")) {
           lines.push(`${baseIndent}${indent}-`);
           lines.push(encoded);
         } else {
@@ -283,7 +314,7 @@ function encodeValue(value: JsonValue, options: EncodeOptions, indentLevel: numb
         }
       }
     }
-    return '\n' + lines.join('\n');
+    return "\n" + lines.join("\n");
   }
 
   // Objects
@@ -291,7 +322,7 @@ function encodeValue(value: JsonValue, options: EncodeOptions, indentLevel: numb
   const keys = options.sortKeys ? Object.keys(obj).sort() : Object.keys(obj);
 
   if (keys.length === 0) {
-    return '';
+    return "";
   }
 
   const lines: string[] = [];
@@ -301,21 +332,25 @@ function encodeValue(value: JsonValue, options: EncodeOptions, indentLevel: numb
 
     if (val === null) {
       lines.push(`${baseIndent}${key}: null`);
-    } else if (typeof val !== 'object') {
+    } else if (typeof val !== "object") {
       lines.push(`${baseIndent}${key}: ${formatPrimitive(val, options)}`);
     } else if (Array.isArray(val)) {
       if (val.length === 0) {
         lines.push(`${baseIndent}${key}: []`);
       } else if (isPrimitiveArray(val)) {
-        lines.push(`${baseIndent}${key}: ${val.map((v) => formatPrimitive(v, options)).join(', ')}`);
+        lines.push(
+          `${baseIndent}${key}: ${val.map((v) => formatPrimitive(v, options)).join(", ")}`,
+        );
       } else {
-        lines.push(`${baseIndent}${key}:${encodeValue(val, options, indentLevel)}`);
+        lines.push(
+          `${baseIndent}${key}:${encodeValue(val, options, indentLevel)}`,
+        );
       }
     } else {
       const nested = encodeValue(val, options, indentLevel + 1);
-      if (nested === '') {
+      if (nested === "") {
         lines.push(`${baseIndent}${key}:`);
-      } else if (nested.includes('\n')) {
+      } else if (nested.includes("\n")) {
         lines.push(`${baseIndent}${key}:`);
         lines.push(nested);
       } else {
@@ -324,7 +359,7 @@ function encodeValue(value: JsonValue, options: EncodeOptions, indentLevel: numb
     }
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 /**
@@ -359,17 +394,17 @@ export function encode(value: unknown, options: EncodeOptions = {}): string {
   };
 
   if (value === null || value === undefined) {
-    return 'null';
+    return "null";
   }
 
-  if (typeof value !== 'object') {
+  if (typeof value !== "object") {
     return formatPrimitive(value as JsonValue, opts);
   }
 
   if (Array.isArray(value)) {
-    if (value.length === 0) return '_: []';
+    if (value.length === 0) return "_: []";
     if (isPrimitiveArray(value)) {
-      return `_: ${value.map((v) => formatPrimitive(v, opts)).join(', ')}`;
+      return `_: ${value.map((v) => formatPrimitive(v, opts)).join(", ")}`;
     }
     if (isTableArray(value)) {
       return `_:\n${encodeTable(value, opts, 1)}`;
@@ -386,12 +421,12 @@ export function encode(value: unknown, options: EncodeOptions = {}): string {
 function parsePrimitive(value: string): JsonValue {
   const trimmed = value.trim();
 
-  if (trimmed === 'null' || trimmed === '-' || trimmed === '') {
+  if (trimmed === "null" || trimmed === "-" || trimmed === "") {
     return null;
   }
 
-  if (trimmed === 'true') return true;
-  if (trimmed === 'false') return false;
+  if (trimmed === "true") return true;
+  if (trimmed === "false") return false;
 
   if (REVERSE_SYMBOLS[trimmed]) {
     return REVERSE_SYMBOLS[trimmed];
@@ -415,19 +450,19 @@ function parsePrimitive(value: string): JsonValue {
 function parseTable(
   lines: string[],
   startIndex: number,
-  indent: number
+  indent: number,
 ): { value: JsonValue[]; endIndex: number } {
   const result: Record<string, JsonValue>[] = [];
   let headers: string[] = [];
   let i = startIndex;
 
   const headerLine = lines[i].trim();
-  if (!headerLine.startsWith('|')) {
+  if (!headerLine.startsWith("|")) {
     return { value: [], endIndex: startIndex };
   }
 
   headers = headerLine
-    .split('|')
+    .split("|")
     .slice(1, -1)
     .map((h) => h.trim());
 
@@ -438,16 +473,16 @@ function parseTable(
     const lineIndent = line.length - line.trimStart().length;
     const trimmed = line.trim();
 
-    if (!trimmed.startsWith('|')) {
+    if (!trimmed.startsWith("|")) {
       break;
     }
 
-    if (lineIndent < indent && trimmed !== '') {
+    if (lineIndent < indent && trimmed !== "") {
       break;
     }
 
     const cells = trimmed
-      .split('|')
+      .split("|")
       .slice(1, -1)
       .map((c) => parsePrimitive(c.trim()));
 
@@ -472,7 +507,7 @@ function parseDocument(
   lines: string[],
   startIndex: number,
   baseIndent: number,
-  options: DecodeOptions
+  options: DecodeOptions,
 ): { value: JsonValue; endIndex: number } {
   const result: Record<string, JsonValue> = {};
   let i = startIndex;
@@ -480,7 +515,7 @@ function parseDocument(
   while (i < lines.length) {
     const line = lines[i];
 
-    if (line.trim() === '' || line.trim().startsWith('#')) {
+    if (line.trim() === "" || line.trim().startsWith("#")) {
       i++;
       continue;
     }
@@ -501,12 +536,12 @@ function parseDocument(
     const trimmed = line.trim();
 
     // Table rows at this level shouldn't happen in object context
-    if (trimmed.startsWith('|')) {
+    if (trimmed.startsWith("|")) {
       i++;
       continue;
     }
 
-    const colonIndex = trimmed.indexOf(':');
+    const colonIndex = trimmed.indexOf(":");
     if (colonIndex === -1) {
       i++;
       continue;
@@ -515,13 +550,13 @@ function parseDocument(
     const key = trimmed.slice(0, colonIndex).trim();
     const valueStr = trimmed.slice(colonIndex + 1).trim();
 
-    if (valueStr === '' || valueStr === '[]') {
+    if (valueStr === "" || valueStr === "[]") {
       // Look ahead for nested content
       let foundNested = false;
       let nextIdx = i + 1;
 
       // Skip blank lines to find actual content
-      while (nextIdx < lines.length && lines[nextIdx].trim() === '') {
+      while (nextIdx < lines.length && lines[nextIdx].trim() === "") {
         nextIdx++;
       }
 
@@ -530,15 +565,24 @@ function parseDocument(
         const nextIndent = nextLine.length - nextLine.trimStart().length;
         const nextTrimmed = nextLine.trim();
 
-        if (nextIndent > baseIndent && nextTrimmed.startsWith('|')) {
+        if (nextIndent > baseIndent && nextTrimmed.startsWith("|")) {
           // Parse table
           const tableResult = parseTable(lines, nextIdx, nextIndent);
           result[key] = tableResult.value;
           i = tableResult.endIndex + 1;
           foundNested = true;
-        } else if (nextIndent > baseIndent && nextTrimmed !== '' && !nextTrimmed.startsWith('#')) {
+        } else if (
+          nextIndent > baseIndent &&
+          nextTrimmed !== "" &&
+          !nextTrimmed.startsWith("#")
+        ) {
           // Parse nested object
-          const nestedResult = parseDocument(lines, nextIdx, nextIndent, options);
+          const nestedResult = parseDocument(
+            lines,
+            nextIdx,
+            nextIndent,
+            options,
+          );
           result[key] = nestedResult.value;
           i = nestedResult.endIndex;
           foundNested = true;
@@ -546,18 +590,18 @@ function parseDocument(
       }
 
       if (!foundNested) {
-        result[key] = valueStr === '[]' ? [] : {};
+        result[key] = valueStr === "[]" ? [] : {};
         i++;
       }
     } else if (valueStr.startsWith('"') && valueStr.endsWith('"')) {
       // Quoted string - parse as single value, don't split
       result[key] = parsePrimitive(valueStr);
       i++;
-    } else if (valueStr.includes(' | ')) {
-      result[key] = valueStr.split(' | ').map((v) => parsePrimitive(v.trim()));
+    } else if (valueStr.includes(" | ")) {
+      result[key] = valueStr.split(" | ").map((v) => parsePrimitive(v.trim()));
       i++;
-    } else if (valueStr.includes(', ')) {
-      result[key] = valueStr.split(', ').map((v) => parsePrimitive(v.trim()));
+    } else if (valueStr.includes(", ")) {
+      result[key] = valueStr.split(", ").map((v) => parsePrimitive(v.trim()));
       i++;
     } else {
       result[key] = parsePrimitive(valueStr);
@@ -595,17 +639,18 @@ export function decode(input: string, options: DecodeOptions = {}): unknown {
     ...options,
   };
 
-  const normalized = input.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
-  const lines = normalized.split('\n');
+  const normalized = input.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+  const lines = normalized.split("\n");
 
-  if (lines.every((l) => l.trim() === '' || l.trim().startsWith('#'))) {
+  if (lines.every((l) => l.trim() === "" || l.trim().startsWith("#"))) {
     return {};
   }
 
   let startIndex = 0;
   while (
     startIndex < lines.length &&
-    (lines[startIndex].trim() === '' || lines[startIndex].trim().startsWith('#'))
+    (lines[startIndex].trim() === "" ||
+      lines[startIndex].trim().startsWith("#"))
   ) {
     startIndex++;
   }
@@ -615,23 +660,23 @@ export function decode(input: string, options: DecodeOptions = {}): unknown {
   }
 
   const firstLine = lines[startIndex].trim();
-  if (firstLine.startsWith('|')) {
+  if (firstLine.startsWith("|")) {
     const tableResult = parseTable(lines, startIndex, 0);
     return tableResult.value;
   }
 
-  if (firstLine.startsWith('_:')) {
+  if (firstLine.startsWith("_:")) {
     const valueStr = firstLine.slice(2).trim();
-    if (valueStr === '' || valueStr === '[]') {
+    if (valueStr === "" || valueStr === "[]") {
       const nextLine = lines[startIndex + 1];
-      if (nextLine && nextLine.trim().startsWith('|')) {
+      if (nextLine && nextLine.trim().startsWith("|")) {
         const tableResult = parseTable(lines, startIndex + 1, 2);
         return tableResult.value;
       }
       return [];
     }
-    if (valueStr.includes(', ')) {
-      return valueStr.split(', ').map((v) => parsePrimitive(v.trim()));
+    if (valueStr.includes(", ")) {
+      return valueStr.split(", ").map((v) => parsePrimitive(v.trim()));
     }
     return [parsePrimitive(valueStr)];
   }
@@ -648,7 +693,7 @@ export function decode(input: string, options: DecodeOptions = {}): unknown {
  */
 export function validate(input: string): ValidationResult {
   const errors: ValidationError[] = [];
-  const lines = input.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+  const lines = input.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
 
   let inTable = false;
   let tableColumns = 0;
@@ -658,7 +703,7 @@ export function validate(input: string): ValidationResult {
     const lineNum = i + 1;
     const trimmed = line.trim();
 
-    if (trimmed === '' || trimmed.startsWith('#')) {
+    if (trimmed === "" || trimmed.startsWith("#")) {
       continue;
     }
 
@@ -673,8 +718,8 @@ export function validate(input: string): ValidationResult {
       });
     }
 
-    if (trimmed.startsWith('|')) {
-      const pipes = trimmed.split('|').length - 1;
+    if (trimmed.startsWith("|")) {
+      const pipes = trimmed.split("|").length - 1;
 
       if (!inTable) {
         inTable = true;
@@ -690,11 +735,11 @@ export function validate(input: string): ValidationResult {
         }
       }
 
-      if (!trimmed.endsWith('|')) {
+      if (!trimmed.endsWith("|")) {
         errors.push({
           line: lineNum,
           column: trimmed.length,
-          message: 'Table row must end with |',
+          message: "Table row must end with |",
           context: line,
         });
       }
@@ -734,4 +779,24 @@ export function estimateTokens(data: unknown): TokenEstimate {
   };
 }
 
-export default { encode, decode, validate, estimateTokens };
+export {
+  encodeDocument,
+  decodeDocument,
+  type MintDocument,
+  type MintSection,
+  type MintDocBlock,
+  type MintDocTable,
+  type MintDocList,
+  type MintDocFigure,
+} from "./document";
+
+import { encodeDocument, decodeDocument } from "./document";
+
+export default {
+  encode,
+  decode,
+  validate,
+  estimateTokens,
+  encodeDocument,
+  decodeDocument,
+};
