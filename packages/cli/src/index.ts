@@ -8,7 +8,7 @@
 
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { resolve, extname } from 'path';
-import { encode, decode, validate, estimateTokens } from '@q1k-oss/mint-format';
+import { encode, decode, validate } from '@q1k-oss/mint-format';
 
 interface CliOptions {
   input?: string;
