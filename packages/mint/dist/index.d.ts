@@ -43,16 +43,16 @@ interface MintDocFigure {
     page?: number;
 }
 type MintDocBlock = {
-    type: 'text';
+    type: "text";
     text: string;
 } | {
-    type: 'table';
+    type: "table";
     table: MintDocTable;
 } | {
-    type: 'list';
+    type: "list";
     list: MintDocList;
 } | {
-    type: 'figure';
+    type: "figure";
     figure: MintDocFigure;
 };
 interface MintSection {

@@ -52,7 +52,8 @@ function renderTable(table, out) {
   );
   const fmtRow = (cells) => `| ${cells.map((c, i) => (c ?? "").padEnd(widths[i])).join(" | ")} |`;
   out.push(fmtRow(table.headers));
-  for (const row of table.rows) out.push(fmtRow(table.headers.map((_, i) => row[i] ?? "")));
+  for (const row of table.rows)
+    out.push(fmtRow(table.headers.map((_, i) => row[i] ?? "")));
 }
 function renderBlock(block, out) {
   switch (block.type) {
@@ -70,7 +71,8 @@ function renderBlock(block, out) {
     case "figure": {
       const parts = [];
       if (block.figure.caption) parts.push(quote(block.figure.caption));
-      if (typeof block.figure.page === "number") parts.push(`p.${block.figure.page}`);
+      if (typeof block.figure.page === "number")
+        parts.push(`p.${block.figure.page}`);
       out.push(`@fig:${parts.length ? ` ${parts.join(" ")}` : ""}`);
       break;
     }
@@ -117,10 +119,16 @@ function decodeDocument(input) {
     doc.metadata = meta;
   }
   let current = null;
-  const state = { text: null, list: null, table: null, pendingTableCaption: void 0 };
+  const state = {
+    text: null,
+    list: null,
+    table: null,
+    pendingTableCaption: void 0
+  };
   const flush = () => {
     if (!current) return;
-    if (state.text) current.blocks.push({ type: "text", text: state.text.join("\n") });
+    if (state.text)
+      current.blocks.push({ type: "text", text: state.text.join("\n") });
     if (state.list) current.blocks.push({ type: "list", list: state.list });
     if (state.table) {
       const [headers, ...rows] = state.table.rows;
@@ -138,7 +146,11 @@ function decodeDocument(input) {
     const headingMatch = /^§(\d+)\s(.*)$/.exec(line);
     if (headingMatch) {
       flush();
-      current = { heading: headingMatch[2], level: Number(headingMatch[1]), blocks: [] };
+      current = {
+        heading: headingMatch[2],
+        level: Number(headingMatch[1]),
+        blocks: []
+      };
       doc.sections.push(current);
       continue;
     }
@@ -168,7 +180,8 @@ function decodeDocument(input) {
         figure.page = Number(pageMatch[1]);
         rest = body.slice(0, pageMatch.index).trim();
       }
-      if (rest.startsWith('"') && rest.endsWith('"')) figure.caption = unquote(rest);
+      if (rest.startsWith('"') && rest.endsWith('"'))
+        figure.caption = unquote(rest);
       else if (rest) figure.caption = rest;
       current.blocks.push({ type: "figure", figure });
       continue;
@@ -234,7 +247,8 @@ var REVERSE_SYMBOLS = {
 function needsQuoting(value) {
   if (value === "") return true;
   if (value.startsWith(" ") || value.endsWith(" ")) return true;
-  if (value.includes("|") || value.includes("\n") || value.includes("\r")) return true;
+  if (value.includes("|") || value.includes("\n") || value.includes("\r"))
+    return true;
   if (value.includes(",")) return true;
   if (/^-?\d+\.?\d*$/.test(value)) return true;
   if (["true", "false", "null"].includes(value.toLowerCase())) return true;
@@ -276,7 +290,9 @@ function isPrimitive(value) {
 }
 function isTableArray(arr) {
   if (arr.length === 0) return false;
-  if (!arr.every((item) => item !== null && typeof item === "object" && !Array.isArray(item))) {
+  if (!arr.every(
+    (item) => item !== null && typeof item === "object" && !Array.isArray(item)
+  )) {
     return false;
   }
   const firstKeys = Object.keys(arr[0]).sort().join(",");
@@ -310,7 +326,9 @@ function encodeTable(arr, options, indentLevel) {
   const indent = " ".repeat(options.indent || 2);
   const baseIndent = indent.repeat(indentLevel);
   const headers = Object.keys(arr[0]);
-  const rows = arr.map((obj) => headers.map((h) => formatPrimitive(obj[h], options, true)));
+  const rows = arr.map(
+    (obj) => headers.map((h) => formatPrimitive(obj[h], options, true))
+  );
   const widths = getColumnWidths(headers, rows);
   const lines = [];
   const headerCells = headers.map((h, i) => padCell(h, widths[i]));
@@ -369,9 +387,13 @@ function encodeValue(value, options, indentLevel) {
       if (val.length === 0) {
         lines.push(`${baseIndent}${key}: []`);
       } else if (isPrimitiveArray(val)) {
-        lines.push(`${baseIndent}${key}: ${val.map((v) => formatPrimitive(v, options)).join(", ")}`);
+        lines.push(
+          `${baseIndent}${key}: ${val.map((v) => formatPrimitive(v, options)).join(", ")}`
+        );
       } else {
-        lines.push(`${baseIndent}${key}:${encodeValue(val, options, indentLevel)}`);
+        lines.push(
+          `${baseIndent}${key}:${encodeValue(val, options, indentLevel)}`
+        );
       }
     } else {
       const nested = encodeValue(val, options, indentLevel + 1);
@@ -509,7 +531,12 @@ function parseDocument(lines, startIndex, baseIndent, options) {
           i = tableResult.endIndex + 1;
           foundNested = true;
         } else if (nextIndent > baseIndent && nextTrimmed !== "" && !nextTrimmed.startsWith("#")) {
-          const nestedResult = parseDocument(lines, nextIdx, nextIndent, options);
+          const nestedResult = parseDocument(
+            lines,
+            nextIdx,
+            nextIndent,
+            options
+          );
           result[key] = nestedResult.value;
           i = nestedResult.endIndex;
           foundNested = true;
@@ -644,7 +671,14 @@ function estimateTokens(data) {
     savingsPercent
   };
 }
-var index_default = { encode, decode, validate, estimateTokens, encodeDocument, decodeDocument };
+var index_default = {
+  encode,
+  decode,
+  validate,
+  estimateTokens,
+  encodeDocument,
+  decodeDocument
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   decode,
