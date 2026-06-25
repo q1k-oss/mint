@@ -1,3 +1,173 @@
+// src/document.ts
+var RESERVED_LINE = /^(§|@|\||- |\\|\d+\. )/;
+function escapeProse(line) {
+  return RESERVED_LINE.test(line) ? `\\${line}` : line;
+}
+function unescapeProse(line) {
+  return line.startsWith("\\") ? line.slice(1) : line;
+}
+function quote(value) {
+  return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+}
+function unquote(value) {
+  const inner = value.slice(1, -1);
+  return inner.replace(/\\"/g, '"').replace(/\\\\/g, "\\");
+}
+function renderTable(table, out) {
+  if (table.caption) out.push(`@table: ${table.caption}`);
+  const widths = table.headers.map(
+    (h, i) => Math.max(h.length, ...table.rows.map((r) => (r[i] ?? "").length))
+  );
+  const fmtRow = (cells) => `| ${cells.map((c, i) => (c ?? "").padEnd(widths[i])).join(" | ")} |`;
+  out.push(fmtRow(table.headers));
+  for (const row of table.rows) out.push(fmtRow(table.headers.map((_, i) => row[i] ?? "")));
+}
+function renderBlock(block, out) {
+  switch (block.type) {
+    case "text":
+      for (const line of block.text.split("\n")) out.push(escapeProse(line));
+      break;
+    case "table":
+      renderTable(block.table, out);
+      break;
+    case "list":
+      block.list.items.forEach(
+        (item, i) => out.push(block.list.ordered ? `${i + 1}. ${item}` : `- ${item}`)
+      );
+      break;
+    case "figure": {
+      const parts = [];
+      if (block.figure.caption) parts.push(quote(block.figure.caption));
+      if (typeof block.figure.page === "number") parts.push(`p.${block.figure.page}`);
+      out.push(`@fig:${parts.length ? ` ${parts.join(" ")}` : ""}`);
+      break;
+    }
+  }
+}
+function encodeDocument(doc) {
+  const out = [];
+  if (doc.title) out.push(`@title ${doc.title}`);
+  if (doc.metadata && Object.keys(doc.metadata).length > 0) {
+    out.push("@meta");
+    for (const [key, value] of Object.entries(doc.metadata)) {
+      out.push(`  ${key}: ${value}`);
+    }
+  }
+  for (const section of doc.sections) {
+    out.push(`\xA7${section.level} ${section.heading}`);
+    for (const block of section.blocks) renderBlock(block, out);
+  }
+  return out.join("\n");
+}
+function splitRow(line) {
+  return line.trim().split("|").slice(1, -1).map((c) => c.trim());
+}
+function decodeDocument(input) {
+  const lines = input.replace(/\r\n/g, "\n").replace(/\r/g, "\n").split("\n");
+  const doc = { sections: [] };
+  let i = 0;
+  if (lines[i]?.startsWith("@title ")) {
+    doc.title = lines[i].slice("@title ".length);
+    i++;
+  }
+  if (lines[i] === "@meta") {
+    i++;
+    const meta = {};
+    while (i < lines.length && /^\s+\S/.test(lines[i]) && !lines[i].startsWith("\xA7")) {
+      const trimmed = lines[i].trim();
+      const colon = trimmed.indexOf(":");
+      if (colon === -1) break;
+      const key = trimmed.slice(0, colon).trim();
+      const raw = trimmed.slice(colon + 1).trim();
+      meta[key] = /^-?\d+(\.\d+)?$/.test(raw) ? Number(raw) : raw;
+      i++;
+    }
+    doc.metadata = meta;
+  }
+  let current = null;
+  const state = { text: null, list: null, table: null, pendingTableCaption: void 0 };
+  const flush = () => {
+    if (!current) return;
+    if (state.text) current.blocks.push({ type: "text", text: state.text.join("\n") });
+    if (state.list) current.blocks.push({ type: "list", list: state.list });
+    if (state.table) {
+      const [headers, ...rows] = state.table.rows;
+      current.blocks.push({
+        type: "table",
+        table: { caption: state.table.caption, headers: headers ?? [], rows }
+      });
+    }
+    state.text = null;
+    state.list = null;
+    state.table = null;
+  };
+  for (; i < lines.length; i++) {
+    const line = lines[i];
+    const headingMatch = /^§(\d+)\s(.*)$/.exec(line);
+    if (headingMatch) {
+      flush();
+      current = { heading: headingMatch[2], level: Number(headingMatch[1]), blocks: [] };
+      doc.sections.push(current);
+      continue;
+    }
+    if (!current) continue;
+    if (line.startsWith("@table")) {
+      flush();
+      const colon = line.indexOf(":");
+      state.pendingTableCaption = colon !== -1 ? line.slice(colon + 1).trim() || void 0 : void 0;
+      continue;
+    }
+    if (line.startsWith("|")) {
+      if (!state.table) {
+        flush();
+        state.table = { caption: state.pendingTableCaption, rows: [] };
+        state.pendingTableCaption = void 0;
+      }
+      state.table.rows.push(splitRow(line));
+      continue;
+    }
+    if (line.startsWith("@fig:")) {
+      flush();
+      const body = line.slice("@fig:".length).trim();
+      const figure = {};
+      const pageMatch = /\bp\.(\d+)\s*$/.exec(body);
+      let rest = body;
+      if (pageMatch) {
+        figure.page = Number(pageMatch[1]);
+        rest = body.slice(0, pageMatch.index).trim();
+      }
+      if (rest.startsWith('"') && rest.endsWith('"')) figure.caption = unquote(rest);
+      else if (rest) figure.caption = rest;
+      current.blocks.push({ type: "figure", figure });
+      continue;
+    }
+    const orderedMatch = /^(\d+)\.\s(.*)$/.exec(line);
+    if (orderedMatch) {
+      if (!state.list || !state.list.ordered) {
+        flush();
+        state.list = { ordered: true, items: [] };
+      }
+      state.list.items.push(orderedMatch[2]);
+      continue;
+    }
+    if (line.startsWith("- ")) {
+      if (!state.list || state.list.ordered) {
+        flush();
+        state.list = { ordered: false, items: [] };
+      }
+      state.list.items.push(line.slice(2));
+      continue;
+    }
+    if (!state.text) {
+      flush();
+      state.text = [];
+    }
+    state.text.push(unescapeProse(line));
+  }
+  flush();
+  return doc;
+}
+
 // src/index.ts
 var STATUS_SYMBOLS = {
   completed: "\u2713",
@@ -442,11 +612,13 @@ function estimateTokens(data) {
     savingsPercent
   };
 }
-var index_default = { encode, decode, validate, estimateTokens };
+var index_default = { encode, decode, validate, estimateTokens, encodeDocument, decodeDocument };
 export {
   decode,
+  decodeDocument,
   index_default as default,
   encode,
+  encodeDocument,
   estimateTokens,
   validate
 };
