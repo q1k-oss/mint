@@ -1,0 +1,31 @@
+name: Discord Notify
+
+# Posts a Discord embed on every push. The webhook URL is a repo secret
+# (DISCORD_WEBHOOK); it never appears in this file. No-ops when the secret is
+# unset, so forks and secret-less environments don't fail here.
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  notify:
+    name: notify discord
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' }}
+    steps:
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          ACTOR: ${{ github.actor }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          [ -z "$DISCORD_WEBHOOK" ] && { echo "DISCORD_WEBHOOK not set; skipping"; exit 0; }
+          desc=$(printf '**%s** @ `%s` by %s\n%s\n[View run](%s)' "$BRANCH" "${SHA:0:7}" "$ACTOR" "$COMMIT_MSG" "$RUN_URL")
+          jq -n --arg t "📦 Push · $REPO" --arg d "$desc" --argjson c 5793266 \
+            '{username:"github-ci", embeds:[{title:$t, description:$d, color:$c}]}' \
+            | curl -sf -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK" || echo "discord notify failed (non-fatal)"
